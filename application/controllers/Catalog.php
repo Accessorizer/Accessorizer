@@ -1,16 +1,12 @@
 <?php
+
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Welcome extends Application
+class Catalog extends Application
 {
 
-	function __construct()
-	{
-		parent::__construct();
-	}
-
 	/**
-	 * Homepage for our app
+	 * Index page.
 	 */
 	public function index()
 	{
@@ -22,13 +18,10 @@ class Welcome extends Application
 			}
 			$category->accessories = $accessories;
 		}
-		
-		$sets = $this->sets->all();
-		
-		$this->data['sets'] = $sets;
+
         $this->data['categories'] = $categories;
-		$this->data['pagebody'] = 'homepage';
-		$this->data['pagetitle'] = 'Choose your preset';
+        $this->data['pagebody'] = 'catalog';
+		$this->data['pagetitle'] = 'Accessorize Soldier!';
 		$this->render();
 	}
 
