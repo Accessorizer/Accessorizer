@@ -65,16 +65,11 @@ class Set extends Application
         /* New Set ----------------------------*/
         $set = (array) $this->session->userdata('set');
         $set = array_merge($set, $this->input->post());
-        
-        var_dump($set);
-        die();
 
         $set = (object) $set;
         $this->session->set_userdata('set', (object) $set);
 
-        if (!empty($set->name)) {
-            $set->id = $this->sets->highest() + 1;
-            
+        if (!empty($set->name)) {            
             if (!empty($set->weapon)) {
                 $set->weapon = $this->accessories->some('accessoryName', $set->weapon)[0]->accessoryId;
             }
@@ -91,7 +86,12 @@ class Set extends Application
                 $set->accessory = $this->accessories->some('accessoryName', $set->accessory)[0]->accessoryId;
             }
 
+            if (empty($set->id)) {
+                $set->id = $this->sets->highest() + 1;
+            }
+            
             $this->sets->add($set);
+            
         }
 
         redirect($_SERVER['HTTP_REFERER']);
