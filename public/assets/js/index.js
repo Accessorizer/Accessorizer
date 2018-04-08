@@ -17,6 +17,10 @@ $(function () {
         // Get the set id.
         var setID = $(this).attr("data-setid");
 
+        $('#set-id').val(setID);
+
+        console.log(setID);
+
         // Query the specific set.
         data.getSets(setID, function (set) {
 
@@ -31,7 +35,7 @@ $(function () {
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
-                    setInputField(item);
+                    setInputField(item, itemType);
                 }
 
                 if (set["head"]) {
@@ -39,7 +43,7 @@ $(function () {
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
-                    setInputField(item);                    
+                    setInputField(item, itemType);                 
                 }
 
                 if (set["weapon"]) {
@@ -47,7 +51,7 @@ $(function () {
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
-                    setInputField(item);                    
+                    setInputField(item, itemType);                                        
                 }
 
                 if (set["accessory"]) {
@@ -55,8 +59,10 @@ $(function () {
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
-                    setInputField(item);                    
+                    setInputField(item, itemType);                    
                 }
+
+                $('#set-id').val(setID);
 
             });
 
@@ -67,18 +73,17 @@ $(function () {
      * Put the set name into the input field when changing sets.
      * @param {Item} item   object contains all the info on the item
      */
-    function setInputField(itemName) {
+    function setInputField(itemName, itemType) {
+
+        console.log("ItemName: " + itemName);
+        console.log("ItemType: " + itemType);
 
         // WHEN WE LOAD A SET, WE NEED TO SET THE INPUT FIELD VALUES BEFORE SAVING
+        // if ( $("#m16 img").hasClass( "can-drop" )) {
+        //     $('#weapon-selected').val("m16");
+        //   }
 
-        let i = $('#' + itemName + '-selected');
-
-        console.log("ID: " + itemName);
-        
-
-        i.val(itemName);
-
-        console.log(i.val());
+        $('#' + itemType + '-selected').val(itemName);
     }
 
 

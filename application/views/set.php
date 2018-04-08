@@ -81,6 +81,7 @@
 
             <div class="row">
                 <input id="set-name" form="set-form" class="form-control" type="text" name="name" placeholder="Set Name" required>
+                <input id="set-id" form="set-form" name="id" hidden>
                 <input id="set-save" form="set-form" class="btn btn-success mx-auto" type="submit" value="Save">
             </div>
             <div class="row">
