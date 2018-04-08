@@ -32,10 +32,43 @@ class Set extends Application
         
     }
 
-    public function save() {
+    public function save($id = null) {
+
+        if ($id == null) {
+     
+            $this->new_set();
+        }
+
+        $set = $this->sets->get($id);
+
+        $this->session->set_userdata('set', $set);
+        $task = $this->session->userdata('set');
+
+         // setup for validation
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules($this->sets->rules());
+
+        // retrieve & update data transfer buffer
+        $set = (array) $this->session->userdata('set');
+        $set = array_merge($set, $this->input->post());
+        $set = (object) $set;  // convert back to object
+        $this->session->set_userdata('set', (object) $set);
+
+        $this->sets->update($set);
+        
+        redirect($_SERVER['HTTP_REFERER']);
+        
+        
+    }
+
+    private function new_set() {
+        /* New Set ----------------------------*/
         $set = (array) $this->session->userdata('set');
         $set = array_merge($set, $this->input->post());
         
+        var_dump($set);
+        die();
+
         $set = (object) $set;
         $this->session->set_userdata('set', (object) $set);
 
@@ -60,5 +93,8 @@ class Set extends Application
 
             $this->sets->add($set);
         }
+
+        redirect($_SERVER['HTTP_REFERER']);
     }
+
 }
