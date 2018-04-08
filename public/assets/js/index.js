@@ -17,14 +17,11 @@ $(function () {
         // Get the set id.
         var setID = $(this).attr("data-setid");
 
-        $('#set-id').val(setID);
-
-        console.log(setID);
-
         // Query the specific set.
         data.getSets(setID, function (set) {
 
             $('#set-name').val(set.name)
+            $('#set-id').val(setID);
 
             // Load in the accessories.
             data.getCatalog(null, function (catalog) {
@@ -35,7 +32,6 @@ $(function () {
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
-                    setInputField(item, itemType);
                 }
 
                 if (set["head"]) {
@@ -43,7 +39,6 @@ $(function () {
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
-                    setInputField(item, itemType);                 
                 }
 
                 if (set["weapon"]) {
@@ -51,7 +46,6 @@ $(function () {
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
-                    setInputField(item, itemType);                                        
                 }
 
                 if (set["accessory"]) {
@@ -59,7 +53,7 @@ $(function () {
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
-                    setInputField(item, itemType);                    
+                                        
                 }
 
                 $('#set-id').val(setID);
@@ -67,63 +61,6 @@ $(function () {
             });
 
         });
-    }
-
-    /**
-     * Put the set name into the input field when changing sets.
-     * @param {Item} item   object contains all the info on the item
-     */
-    function setInputField(itemName, itemType) {
-
-        console.log("ItemName: " + itemName);
-        console.log("ItemType: " + itemType);
-
-        // WHEN WE LOAD A SET, WE NEED TO SET THE INPUT FIELD VALUES BEFORE SAVING
-        // if ( $("#m16 img").hasClass( "can-drop" )) {
-        //     $('#weapon-selected').val("m16");
-        //   }
-
-        $('#' + itemType + '-selected').val(itemName);
-    }
-
-
-    /**
-     * Moves an item in catalog to a specified slot. Used for editing sets.
-     * @param {String} item 
-     * @param {String} slot 
-     */
-    function moveItemToSlot(item, itemType) {
-
-        // Making our jQuery identifier
-        var itemName = "#" + item;
-
-        // This will only work if there's a single img element,
-        // we shouldn't ever have more though - just FYI
-        var draggable = $(itemName).children('img');
-
-        // Getting our specific slot in the slots div
-        var slotName = ".slots #" + itemType;
-        var slot = $(slotName);
-
-        // Get offset of slot relative to overlay element..
-        var slotOffset = slot.offset();
-
-        // Then use that offset to move the item there
-        var itemOffset = draggable.offset();
-
-        var offsetDiff = {
-            top: slotOffset.top - itemOffset.top,
-            left: slotOffset.left - itemOffset.left,
-        };
-
-        draggable.css('transform', 'translate(' + offsetDiff.left + 'px, ' + offsetDiff.top + 'px)');
-        draggable.attr('data-x', offsetDiff.left)
-        draggable.attr('data-y', offsetDiff.top)
-
-        draggable.addClass('can-drop');
-
-        console.log(character)
-
     }
 
 });
@@ -187,6 +124,61 @@ let character = {
 
 /* Drag-and-Drop Functions
 ------------------------------------------------------------------------------*/
+
+/**
+ * Put the set name into the input field when changing sets.
+ * @param {Item} item   object contains all the info on the item
+ */
+function setInputField(itemName, itemType) {
+    $('#' + itemType + '-selected').val(itemName);
+}
+
+
+/**
+ * Put the set name into the input field when changing sets.
+ * @param {Item} item   object contains all the info on the item
+ */
+function removeInputField(itemType) {
+    $('#' + itemType + '-selected').val(null);
+}
+
+
+/**
+ * Moves an item in catalog to a specified slot. Used for editing sets.
+ * @param {String} item 
+ * @param {String} slot 
+ */
+function moveItemToSlot(item, itemType) {
+
+    // Making our jQuery identifier
+    var itemName = "#" + item;
+
+    // This will only work if there's a single img element,
+    // we shouldn't ever have more though - just FYI
+    var draggable = $(itemName).children('img');
+
+    // Getting our specific slot in the slots div
+    var slotName = ".slots #" + itemType;
+    var slot = $(slotName);
+
+    // Get offset of slot relative to overlay element..
+    var slotOffset = slot.offset();
+
+    // Then use that offset to move the item there
+    var itemOffset = draggable.offset();
+
+    var offsetDiff = {
+        top: slotOffset.top - itemOffset.top,
+        left: slotOffset.left - itemOffset.left,
+    };
+
+    draggable.css('transform', 'translate(' + offsetDiff.left + 'px, ' + offsetDiff.top + 'px)');
+    draggable.attr('data-x', offsetDiff.left)
+    draggable.attr('data-y', offsetDiff.top)
+
+    draggable.addClass('can-drop');
+
+}
 
 /**
  * Reset the positions, equipped items, and stats of the character - full reset.
@@ -263,6 +255,8 @@ function addItem(item, itemType) {
     character.slots[itemType].isEquipped = true;
     character.slots[itemType].item = item;
 
+    setInputField(item, itemType);
+
     updateStatsBars();
 
 }
@@ -296,6 +290,8 @@ function removeItem(item, itemType) {
     // Empty the item slot upon the item leaving drag area.
     character.slots[itemType].isEquipped = false;
     character.slots[itemType].item = null;
+
+    removeInputField(itemType);
 
     updateStatsBars();
 
