@@ -6,80 +6,105 @@ $(function() {
     /**
      * Event listener for homepage presets.
      */
-    $("#homepage-presets").on('click', 'li', loadPreset);
-
+    $("#homepage-presets").on('click', 'li', loadPreset); // Set list
+    $('#set-reset').click(resetAll); // Reset Button
+ 
     /**
      * Loads the pre-set options onto the character.
      */
     function loadPreset()
     {
-        characterReset();
+        resetAll();
         // Get the set id.
         var setID = $(this).attr("data-setid");
 
         // Query the specific set.
         data.getSets(setID, function(set) {
+
+            setInputField(set.name);
             
             // Load in the accessories.
             data.getCatalog(null, function(catalog) {
 
-                var damage = 0;
-                var protection = 0;
-                var weight = 0;
-
-                if (set["chest"]) {
-                    // Set chest preset.
-                    $('#chest').html('');
-                    $('#chest').prepend('<img class="draggable drag-drop chest can-drop" src="' + catalog[set["chest"]].accessoryImage + '" />')    
-                    damage += parseInt(catalog[set["chest"]].accessoryDamage);
-                    protection += parseInt(catalog[set["chest"]].accessoryProtection);
-                    weight += parseInt(catalog[set["chest"]].accessoryWeight);
+                // Go into div 'all-items', find corresponding item from 'catalog[set["chest"]]'
+                if (set['chest']) {
+                    let itemType = 'chest';                    
+                    let item = catalog[set[itemType]].accessoryName;
+                    moveItemToSlot(item, itemType);
+                    addItem(item, itemType);
                 }
-                
+
                 if (set["head"]) {
-                    // Set head preset.
-                    $('#head').html('');
-                    $('#head').prepend('<img class="draggable drag-drop head can-drop" src="' + catalog[set["head"]].accessoryImage + '" />')
-                    damage += parseInt(catalog[set["head"]].accessoryDamage);
-                    protection += parseInt(catalog[set["head"]].accessoryProtection);
-                    weight += parseInt(catalog[set["head"]].accessoryWeight);
+                    let itemType = 'head';                    
+                    let item = catalog[set[itemType]].accessoryName;
+                    moveItemToSlot(item, itemType);
+                    addItem(item, itemType);
                 }
 
                 if (set["weapon"]) {
-                    // Set weapon preset.
-                    $('#weapon').html('');
-                    $('#weapon').prepend('<img class="draggable drag-drop weapon can-drop" src="' + catalog[set["weapon"]].accessoryImage + '" />')
-                    damage += parseInt(catalog[set["weapon"]].accessoryDamage);
-                    protection += parseInt(catalog[set["weapon"]].accessoryProtection);
-                    weight += parseInt(catalog[set["weapon"]].accessoryWeight);
+                    let itemType = 'weapon';                    
+                    let item = catalog[set[itemType]].accessoryName;
+                    moveItemToSlot(item, itemType);
+                    addItem(item, itemType);
                 }
 
                 if (set["accessory"]) {
-                    // Set accessory preset.
-                   $('#accessory').html('');
-                   $('#accessory').prepend('<img class="draggable drag-drop accessory can-drop" src="' + catalog[set["accessory"]].accessoryImage + '" />')
-                   damage += parseInt(catalog[set["accessory"]].accessoryDamage);
-                   protection += parseInt(catalog[set["accessory"]].accessoryProtection);
-                   weight += parseInt(catalog[set["accessory"]].accessoryWeight);
+                    let itemType = 'accessory';                    
+                    let item = catalog[set[itemType]].accessoryName;
+                    moveItemToSlot(item, itemType);
+                    addItem(item, itemType);
                 }
 
-                // Get our stats bars
-                let damageBar = $('.stats .progress #damage-bar').get(0);
-                let protectionBar = $('.stats .progress #protection-bar').get(0);
-                let weightBar = $('.stats .progress #weight-bar').get(0);
-
-                // Update stat bar values.
-                damageBar.setAttribute('aria-valuenow', parseInt(damage));
-                protectionBar.setAttribute('aria-valuenow', parseInt(protection));
-                weightBar.setAttribute('aria-valuenow', parseInt(weight));
-
-                // Update width settings.
-                damageBar.style.width = "" + damage + "%";
-                protectionBar.style.width = "" + protection + "%";
-                weightBar.style.width = "" + weight + "%";
             });
 
         });
+    }
+
+    /**
+     * Put the set name into the input field when changing sets.
+     * @param {String} set 
+     */
+    function setInputField(set) {
+        $('#set-name').val(set)
+    }
+
+    /**
+     * Moves an item in catalog to a specified slot. Used for editing sets.
+     * @param {String} item 
+     * @param {String} slot 
+     */
+    function moveItemToSlot(item, itemType) {
+
+        // Making our jQuery identifier
+        var itemName = "#" + item;
+
+        // This will only work if there's a single img element,
+        // we shouldn't ever have more though - just FYI
+        var draggable = $(itemName).children('img');
+
+        // Getting our specific slot in the slots div
+        var slotName = ".slots #" + itemType;
+        var slot = $(slotName);
+
+        // Get offset of slot relative to overlay element..
+        var slotOffset = slot.offset();
+
+        // Then use that offset to move the item there
+        var itemOffset = draggable.offset();
+
+        var offsetDiff = {
+            top: slotOffset.top - itemOffset.top,
+            left: slotOffset.left - itemOffset.left,
+        };
+
+        draggable.css('transform', 'translate(' + offsetDiff.left + 'px, ' + offsetDiff.top + 'px)');
+        draggable.attr('data-x', offsetDiff.left)
+        draggable.attr('data-y', offsetDiff.top)
+
+        draggable.addClass('can-drop');
+
+        console.log(character)
+
     }
 
 });
@@ -140,18 +165,26 @@ let character = {
     }
 }
 
-let resetButton = $('#set-reset').click(function() {
-    let all = $('.can-drop').toArray();
-    characterReset();
-    for (var i = 0; i < all.length; i++) {
-        itemReset(all[i]);
-    }
-    updateStatsBars();
-});
-
 
 /* Drag-and-Drop Functions
 ------------------------------------------------------------------------------*/
+
+/**
+ * Reset the positions, equipped items, and stats of the character - full reset.
+ */
+function resetAll() {
+    // get all children of items div
+    let allItems = $('#all-items').children('div');
+    let items = allItems.children('img');
+
+    for (let i = 0; i < items.length; i++) {
+        const element = items[i];
+        itemReset(element);
+    }
+
+    characterReset();
+    updateStatsBars();
+}
 
 /**
  * Check to see if an item is valid for the slot it's being hovered/dropped on.
@@ -183,7 +216,7 @@ function itemRemoveTranslation(draggable) {
 
 /**
  * Reset the color and position of an item back to it's origin.
- * @param {[type]} draggable the item we're resetting.
+ * @param {Draggable} draggable
  */
 function itemReset(draggable) {
     itemRemoveColor(draggable);
@@ -192,8 +225,8 @@ function itemReset(draggable) {
 
 /**
  * Add to our character's stats total.
- * @param {[type]} item     the item
- * @param {[type]} itemType the item type
+ * @param {String} item
+ * @param {String} itemType
  */
 function addItem(item, itemType) {
 
@@ -217,10 +250,14 @@ function addItem(item, itemType) {
 
 /**
  * Remove stats from our character's total upon removal of item
- * @param {[type]} item     the item
- * @param {[type]} itemType the item type
+ * @param {String} item     the item name
+ * @param {String} itemType the item type
  */
 function removeItem(item, itemType) {
+
+    if (!character.slots[itemType].isEquipped) {
+        return;
+    }
 
     // Get stats from our item's tooltip div
     let damage = $('#' + item + ' .coupontooltip #damage').html();
@@ -284,14 +321,6 @@ function characterReset() {
 
 }
 
-/**
- * Places all the items on screen from a particular set.
- * @param  {String} set the name of the set
- */
-function getItems(set) {
-    console.log(set);
-}
-
 
 /* Interact.js Implementation and Listeners
 ------------------------------------------------------------------------------*/
@@ -336,6 +365,7 @@ interact('.draggable')
     });
 
 function dragMoveListener(event) {
+
     var target = event.target,
         // keep the dragged position in the data-x/data-y attributes
         x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
@@ -387,6 +417,9 @@ interact('.dropzone').dropzone({
         draggableElement = event.relatedTarget;
         dropzoneElement = event.target;
 
+        console.log("Draggable: ")
+        console.log(draggableElement);
+
         // The item and type that we're dragging (i.e. head, chest, etc.)
         item = draggableElement.parentElement.id;
         itemType = draggableElement.classList.item(2);
@@ -399,7 +432,6 @@ interact('.dropzone').dropzone({
         if (isValidItem(draggableElement, dropzoneElement) &&
             !character.slots[itemType].isEquipped) {
 
-            console.log(draggableElement);
 
             draggableElement.classList.add('can-drop');
 
@@ -463,6 +495,7 @@ interact('.dropzone').dropzone({
 
             // Invalid item, remove color and return to origin position
             itemReset(draggableElement);
+            
 
         }
     },
