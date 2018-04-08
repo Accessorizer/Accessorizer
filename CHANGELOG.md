@@ -2,6 +2,14 @@
 
 ### Note: Add changelog at the bottom of the file
 
+## 2.0.2 (2018-04-08)
+Fix:
+  - remove php code in _menubar
+  
+Feature:
+  - display builder link for admin and user
+  - show page 404 when guest tries to access the builder
+
 ## 2.0.1 (2018-04-07)
 Feature:
   - Create a set
