@@ -20,7 +20,6 @@
     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <!-- TODO: We can't leave this is raw PHP... can we? CodeIgniter doesn't make this easy. -->
                 <p class="nav-link" id="user-role-display">{role}</p>
             </li>
             <li class="dropdown align-self-end" id="role-dropdown">
