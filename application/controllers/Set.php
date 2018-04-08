@@ -10,6 +10,11 @@ class Set extends Application
      */
     public function index()
     {
+        if ($this->session->userdata('role') == ROLE_GUEST) {
+            show_404();
+            die();
+        }
+
         $set = $this->sets->create();
         $this->session->set_userdata('set', $set);
 

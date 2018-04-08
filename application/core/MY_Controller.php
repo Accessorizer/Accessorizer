@@ -33,10 +33,29 @@ class Application extends CI_Controller
 	 */
 	function render($template = 'template')
 	{
-		if (empty($this->session->userdata('role'))) {
-			$this->session->set_userdata('role', ROLE_GUEST);
-		}
+		$role = $this->session->userdata('role');
 		$menuItem = $this->config->item('menu_choices');
+
+		switch ($role) {
+			case ROLE_GUEST:
+				break;
+			case ROLE_USER:
+				$builderLink = array('name' => 'Set Builder', 'link' => '/set');
+				$menuLinks = $menuItem['menudata'];
+				array_push($menuLinks, $builderLink);
+				$menuItem['menudata'] = $menuLinks;
+				break;
+			case ROLE_ADMIN:
+				$builderLink = array('name' => 'Set Builder', 'link' => '/set');
+				$menuLinks = $menuItem['menudata'];
+				array_push($menuLinks, $builderLink);
+				$menuItem['menudata'] = $menuLinks;
+				break;
+			default:
+				$this->session->set_userdata('role', ROLE_GUEST);
+		}
+		
+
 		$menuItem['role'] = $this->session->userdata('role');
 
 		$this->data['menubar'] = $this->parser->parse('_menubar', $menuItem, true);
