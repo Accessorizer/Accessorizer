@@ -1,82 +1,63 @@
 /* Document On-Load's
 ------------------------------------------------------------------------------*/
 
-$(function() {
+$(function () {
 
     /**
      * Event listener for homepage presets.
      */
-    $("#homepage-presets").on('click', 'li', loadPreset);
+    $("#homepage-presets").on('click', 'li', loadPreset); // Set list
+    $('#set-reset').click(resetAll); // Reset Button
 
     /**
      * Loads the pre-set options onto the character.
      */
-    function loadPreset()
-    {
-        characterReset();
+    function loadPreset() {
+        resetAll();
         // Get the set id.
         var setID = $(this).attr("data-setid");
 
         // Query the specific set.
-        data.getSets(setID, function(set) {
-            
+        data.getSets(setID, function (set) {
+
+            $('#set-name').val(set.name)
+            $('#set-id').val(setID);
+
             // Load in the accessories.
-            data.getCatalog(null, function(catalog) {
+            data.getCatalog(null, function (catalog) {
 
-                var damage = 0;
-                var protection = 0;
-                var weight = 0;
-
-                if (set["chest"]) {
-                    // Set chest preset.
-                    $('#chest').html('');
-                    $('#chest').prepend('<img class="draggable drag-drop chest can-drop" src="' + catalog[set["chest"]].accessoryImage + '" />')    
-                    damage += parseInt(catalog[set["chest"]].accessoryDamage);
-                    protection += parseInt(catalog[set["chest"]].accessoryProtection);
-                    weight += parseInt(catalog[set["chest"]].accessoryWeight);
+                // Go into div 'all-items', find corresponding item from 'catalog[set["chest"]]'
+                if (set['chest']) {
+                    let itemType = 'chest';
+                    let item = catalog[set[itemType]].accessoryName;
+                    moveItemToSlot(item, itemType);
+                    addItem(item, itemType);
                 }
-                
+
                 if (set["head"]) {
-                    // Set head preset.
-                    $('#head').html('');
-                    $('#head').prepend('<img class="draggable drag-drop head can-drop" src="' + catalog[set["head"]].accessoryImage + '" />')
-                    damage += parseInt(catalog[set["head"]].accessoryDamage);
-                    protection += parseInt(catalog[set["head"]].accessoryProtection);
-                    weight += parseInt(catalog[set["head"]].accessoryWeight);
+                    let itemType = 'head';
+                    let item = catalog[set[itemType]].accessoryName;
+                    moveItemToSlot(item, itemType);
+                    addItem(item, itemType);
                 }
 
                 if (set["weapon"]) {
-                    // Set weapon preset.
-                    $('#weapon').html('');
-                    $('#weapon').prepend('<img class="draggable drag-drop weapon can-drop" src="' + catalog[set["weapon"]].accessoryImage + '" />')
-                    damage += parseInt(catalog[set["weapon"]].accessoryDamage);
-                    protection += parseInt(catalog[set["weapon"]].accessoryProtection);
-                    weight += parseInt(catalog[set["weapon"]].accessoryWeight);
+                    let itemType = 'weapon';
+                    let item = catalog[set[itemType]].accessoryName;
+                    moveItemToSlot(item, itemType);
+                    addItem(item, itemType);
                 }
 
                 if (set["accessory"]) {
-                    // Set accessory preset.
-                   $('#accessory').html('');
-                   $('#accessory').prepend('<img class="draggable drag-drop accessory can-drop" src="' + catalog[set["accessory"]].accessoryImage + '" />')
-                   damage += parseInt(catalog[set["accessory"]].accessoryDamage);
-                   protection += parseInt(catalog[set["accessory"]].accessoryProtection);
-                   weight += parseInt(catalog[set["accessory"]].accessoryWeight);
+                    let itemType = 'accessory';
+                    let item = catalog[set[itemType]].accessoryName;
+                    moveItemToSlot(item, itemType);
+                    addItem(item, itemType);
+                                        
                 }
 
-                // Get our stats bars
-                let damageBar = $('.stats .progress #damage-bar').get(0);
-                let protectionBar = $('.stats .progress #protection-bar').get(0);
-                let weightBar = $('.stats .progress #weight-bar').get(0);
+                $('#set-id').val(setID);
 
-                // Update stat bar values.
-                damageBar.setAttribute('aria-valuenow', parseInt(damage));
-                protectionBar.setAttribute('aria-valuenow', parseInt(protection));
-                weightBar.setAttribute('aria-valuenow', parseInt(weight));
-
-                // Update width settings.
-                damageBar.style.width = "" + damage + "%";
-                protectionBar.style.width = "" + protection + "%";
-                weightBar.style.width = "" + weight + "%";
             });
 
         });
@@ -90,7 +71,7 @@ $(function() {
 
 let tooltip = document.querySelectorAll('.coupontooltip');
 
-document.addEventListener('mousemove', function(e) {
+document.addEventListener('mousemove', function (e) {
     for (let i = tooltip.length; i--;) {
         tooltip[i].style.left = e.pageX + 'px';
         tooltip[i].style.top = e.pageY + 'px';
@@ -140,18 +121,81 @@ let character = {
     }
 }
 
-let resetButton = $('#set-reset').click(function() {
-    let all = $('.can-drop').toArray();
-    characterReset();
-    for (var i = 0; i < all.length; i++) {
-        itemReset(all[i]);
-    }
-    updateStatsBars();
-});
-
 
 /* Drag-and-Drop Functions
 ------------------------------------------------------------------------------*/
+
+/**
+ * Put the set name into the input field when changing sets.
+ * @param {Item} item   object contains all the info on the item
+ */
+function setInputField(itemName, itemType) {
+    $('#' + itemType + '-selected').val(itemName);
+}
+
+
+/**
+ * Put the set name into the input field when changing sets.
+ * @param {Item} item   object contains all the info on the item
+ */
+function removeInputField(itemType) {
+    $('#' + itemType + '-selected').val(null);
+}
+
+
+/**
+ * Moves an item in catalog to a specified slot. Used for editing sets.
+ * @param {String} item 
+ * @param {String} slot 
+ */
+function moveItemToSlot(item, itemType) {
+
+    // Making our jQuery identifier
+    let itemName = "#" + item;
+
+    // This will only work if there's a single img element,
+    // we shouldn't ever have more though - just FYI
+    let draggable = $(itemName).children('img');
+
+    // Getting our specific slot in the slots div
+    let slotName = ".slots #" + itemType;
+    let slot = $(slotName);
+
+    // Get offset of slot relative to overlay element..
+    let slotOffset = slot.offset();
+
+    // Then use that offset to move the item there
+    let itemOffset = draggable.offset();
+
+    let offsetDiff = {
+        top: slotOffset.top - itemOffset.top,
+        left: slotOffset.left - itemOffset.left,
+    };
+
+    draggable.css('transform', 'translate(' + offsetDiff.left + 'px, ' + offsetDiff.top + 'px)');
+    draggable.attr('data-x', offsetDiff.left)
+    draggable.attr('data-y', offsetDiff.top)
+
+    draggable.addClass('can-drop');
+
+}
+
+/**
+ * Reset the positions, equipped items, and stats of the character - full reset.
+ */
+function resetAll() {
+    // get all children of items div
+    let allItems = $('#all-items').children('div');
+    let items = allItems.children('img');
+
+    for (let i = 0; i < items.length; i++) {
+        const element = items[i];
+        itemReset(element);
+    }
+
+    characterReset();
+    updateStatsBars();
+}
 
 /**
  * Check to see if an item is valid for the slot it's being hovered/dropped on.
@@ -183,7 +227,7 @@ function itemRemoveTranslation(draggable) {
 
 /**
  * Reset the color and position of an item back to it's origin.
- * @param {[type]} draggable the item we're resetting.
+ * @param {Draggable} draggable
  */
 function itemReset(draggable) {
     itemRemoveColor(draggable);
@@ -192,8 +236,8 @@ function itemReset(draggable) {
 
 /**
  * Add to our character's stats total.
- * @param {[type]} item     the item
- * @param {[type]} itemType the item type
+ * @param {String} item
+ * @param {String} itemType
  */
 function addItem(item, itemType) {
 
@@ -211,16 +255,22 @@ function addItem(item, itemType) {
     character.slots[itemType].isEquipped = true;
     character.slots[itemType].item = item;
 
+    setInputField(item, itemType);
+
     updateStatsBars();
 
 }
 
 /**
  * Remove stats from our character's total upon removal of item
- * @param {[type]} item     the item
- * @param {[type]} itemType the item type
+ * @param {String} item     the item name
+ * @param {String} itemType the item type
  */
 function removeItem(item, itemType) {
+
+    if (!character.slots[itemType].isEquipped) {
+        return;
+    }
 
     // Get stats from our item's tooltip div
     let damage = $('#' + item + ' .coupontooltip #damage').html();
@@ -240,6 +290,8 @@ function removeItem(item, itemType) {
     // Empty the item slot upon the item leaving drag area.
     character.slots[itemType].isEquipped = false;
     character.slots[itemType].item = null;
+
+    removeInputField(itemType);
 
     updateStatsBars();
 
@@ -284,14 +336,6 @@ function characterReset() {
 
 }
 
-/**
- * Places all the items on screen from a particular set.
- * @param  {String} set the name of the set
- */
-function getItems(set) {
-    console.log(set);
-}
-
 
 /* Interact.js Implementation and Listeners
 ------------------------------------------------------------------------------*/
@@ -322,11 +366,11 @@ interact('.draggable')
         onmove: dragMoveListener,
 
         // call this function on every dragend event
-        onend: function(event) {
+        onend: function (event) {
             // TODO: implement action for when drag and drop has ended.
         }
     })
-    .on('dragmove', function(event) {
+    .on('dragmove', function (event) {
         x += event.dx;
         y += event.dy;
 
@@ -336,6 +380,7 @@ interact('.draggable')
     });
 
 function dragMoveListener(event) {
+
     var target = event.target,
         // keep the dragged position in the data-x/data-y attributes
         x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
@@ -370,7 +415,7 @@ interact('.dropzone').dropzone({
     /*
     Listener for drop related events.
      */
-    ondropactivate: function(event) {
+    ondropactivate: function (event) {
 
         // add active dropzone feedback
         event.target.classList.add('drop-active');
@@ -381,7 +426,7 @@ interact('.dropzone').dropzone({
     Listener for when an item is dragged to the center of the slot.
     Changes color once successful (green/red).
      */
-    ondragenter: function(event) {
+    ondragenter: function (event) {
 
         // Assign our currently interacting objects
         draggableElement = event.relatedTarget;
@@ -399,7 +444,6 @@ interact('.dropzone').dropzone({
         if (isValidItem(draggableElement, dropzoneElement) &&
             !character.slots[itemType].isEquipped) {
 
-            console.log(draggableElement);
 
             draggableElement.classList.add('can-drop');
 
@@ -415,7 +459,7 @@ interact('.dropzone').dropzone({
     Listener for when an item, which is currently centered on a slot, leaves
     the center of the slot (color goes back to purple).
      */
-    ondragleave: function(event) {
+    ondragleave: function (event) {
 
         draggableElement = event.relatedTarget;
         dropzoneElement = event.target;
@@ -443,7 +487,7 @@ interact('.dropzone').dropzone({
     it's a valid slot for the item, and if not, we return the item to it's
     origin.
      */
-    ondrop: function(event) {
+    ondrop: function (event) {
 
         dropzoneElement = event.target;
         draggableElement = event.relatedTarget;
@@ -464,9 +508,10 @@ interact('.dropzone').dropzone({
             // Invalid item, remove color and return to origin position
             itemReset(draggableElement);
 
+
         }
     },
-    ondropdeactivate: function(event) {
+    ondropdeactivate: function (event) {
 
         // remove active dropzone feedback
         event.target.classList.remove('drop-active');
@@ -479,7 +524,7 @@ interact('.dropzone').dropzone({
 /* Ash Effects
 ------------------------------------------------------------------------------*/
 
-(function() {
+(function () {
     var COLORS, Confetti, NUM_CONFETTI, PI_2, canvas, confetti, context, drawCircle, i, range, resizeWindow, xpos;
 
     NUM_CONFETTI = 50;
@@ -502,22 +547,22 @@ interact('.dropzone').dropzone({
 
     window.h = 0;
 
-    resizeWindow = function() {
+    resizeWindow = function () {
         window.w = canvas.width = window.innerWidth;
         return window.h = canvas.height = window.innerHeight;
     };
 
     window.addEventListener('resize', resizeWindow, false);
 
-    window.onload = function() {
+    window.onload = function () {
         return setTimeout(resizeWindow, 0);
     };
 
-    range = function(a, b) {
+    range = function (a, b) {
         return (b - a) * Math.random() + a;
     };
 
-    drawCircle = function(x, y, r, style) {
+    drawCircle = function (x, y, r, style) {
         context.beginPath();
         context.arc(x, y, r, 0, PI_2, false);
         context.fillStyle = style;
@@ -526,12 +571,12 @@ interact('.dropzone').dropzone({
 
     xpos = 0.5;
 
-    document.onmousemove = function(e) {
+    document.onmousemove = function (e) {
         return xpos = e.pageX / w;
     };
 
-    window.requestAnimationFrame = (function() {
-        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
+    window.requestAnimationFrame = (function () {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
             return window.setTimeout(callback, 1000 / 60);
         };
     })();
@@ -576,7 +621,7 @@ interact('.dropzone').dropzone({
 
     };
 
-    confetti = (function() {
+    confetti = (function () {
         var j, ref, results;
         results = [];
         for (i = j = 1, ref = NUM_CONFETTI; 1 <= ref ? j <= ref : j >= ref; i = 1 <= ref ? ++j : --j) {
@@ -585,7 +630,7 @@ interact('.dropzone').dropzone({
         return results;
     })();
 
-    window.step = function() {
+    window.step = function () {
         var c, j, len, results;
         requestAnimationFrame(step);
         context.clearRect(0, 0, w, h);
