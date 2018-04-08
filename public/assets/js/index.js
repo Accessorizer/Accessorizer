@@ -151,23 +151,23 @@ function removeInputField(itemType) {
 function moveItemToSlot(item, itemType) {
 
     // Making our jQuery identifier
-    var itemName = "#" + item;
+    let itemName = "#" + item;
 
     // This will only work if there's a single img element,
     // we shouldn't ever have more though - just FYI
-    var draggable = $(itemName).children('img');
+    let draggable = $(itemName).children('img');
 
     // Getting our specific slot in the slots div
-    var slotName = ".slots #" + itemType;
-    var slot = $(slotName);
+    let slotName = ".slots #" + itemType;
+    let slot = $(slotName);
 
     // Get offset of slot relative to overlay element..
-    var slotOffset = slot.offset();
+    let slotOffset = slot.offset();
 
     // Then use that offset to move the item there
-    var itemOffset = draggable.offset();
+    let itemOffset = draggable.offset();
 
-    var offsetDiff = {
+    let offsetDiff = {
         top: slotOffset.top - itemOffset.top,
         left: slotOffset.left - itemOffset.left,
     };
