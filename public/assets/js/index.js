@@ -6,7 +6,8 @@ $(function () {
     /**
      * Event listener for homepage presets.
      */
-    $("#homepage-presets").on('click', 'li', loadPreset); // Set list
+    $("#homepage-presets").on('click', 'li', loadPresetStatic); // Set list
+    $("#set-presets").on('click', 'li', loadPreset); // Set list
     $('#set-reset').click(resetAll); // Reset Button
 
     /**
@@ -62,6 +63,81 @@ $(function () {
 
         });
     }
+
+    /**
+     * Loads presets for homepage. Can't be edited.
+     */
+    function loadPresetStatic()
+    {
+
+        // Get the set id.
+        var setID = $(this).attr("data-setid");
+
+        // Query the specific set.
+        data.getSets(setID, function(set) {
+            
+            // Load in the accessories.
+            data.getCatalog(null, function(catalog) { 
+
+                var damage = 0;
+                var protection = 0;
+                var weight = 0;
+
+                $('#chest').html('');
+                if (set["chest"]) {
+                    // Set chest preset.
+                    $('#chest').prepend('<img class="draggable drag-drop chest can-drop" src="' + catalog[set["chest"]].accessoryImage + '" />')    
+                    damage += parseInt(catalog[set["chest"]].accessoryDamage);
+                    protection += parseInt(catalog[set["chest"]].accessoryProtection);
+                    weight += parseInt(catalog[set["chest"]].accessoryWeight);
+                }
+
+                $('#head').html('');                
+                if (set["head"]) {
+                    // Set head preset.
+                    $('#head').prepend('<img class="draggable drag-drop head can-drop" src="' + catalog[set["head"]].accessoryImage + '" />')
+                    damage += parseInt(catalog[set["head"]].accessoryDamage);
+                    protection += parseInt(catalog[set["head"]].accessoryProtection);
+                    weight += parseInt(catalog[set["head"]].accessoryWeight);
+                }
+
+                $('#weapon').html('');
+                if (set["weapon"]) {
+                    // Set weapon preset.
+                    $('#weapon').prepend('<img class="draggable drag-drop weapon can-drop" src="' + catalog[set["weapon"]].accessoryImage + '" />')
+                    damage += parseInt(catalog[set["weapon"]].accessoryDamage);
+                    protection += parseInt(catalog[set["weapon"]].accessoryProtection);
+                    weight += parseInt(catalog[set["weapon"]].accessoryWeight);
+                }
+
+                $('#accessory').html('');
+                if (set["accessory"]) {
+                    // Set accessory preset.
+                    $('#accessory').prepend('<img class="draggable drag-drop accessory can-drop" src="' + catalog[set["accessory"]].accessoryImage + '" />')
+                    damage += parseInt(catalog[set["accessory"]].accessoryDamage);
+                    protection += parseInt(catalog[set["accessory"]].accessoryProtection);
+                    weight += parseInt(catalog[set["accessory"]].accessoryWeight);
+                }
+
+                // Get our stats bars
+                let damageBar = $('.stats .progress #damage-bar').get(0);
+                let protectionBar = $('.stats .progress #protection-bar').get(0);
+                let weightBar = $('.stats .progress #weight-bar').get(0);
+
+                // Update stat bar values.
+                damageBar.setAttribute('aria-valuenow', parseInt(damage));
+                protectionBar.setAttribute('aria-valuenow', parseInt(protection));
+                weightBar.setAttribute('aria-valuenow', parseInt(weight));
+
+                // Update width settings.
+                damageBar.style.width = "" + damage + "%";
+                protectionBar.style.width = "" + protection + "%";
+                weightBar.style.width = "" + weight + "%";
+
+            });
+
+        });
+}
 
 });
 
@@ -336,6 +412,14 @@ function characterReset() {
 
 }
 
+/**
+ * Clear out a div.
+ * @param {Div} elementID 
+ */
+function clearBox(elementID)
+{
+    document.getElementById(elementID).innerHTML = "";
+}
 
 /* Interact.js Implementation and Listeners
 ------------------------------------------------------------------------------*/
