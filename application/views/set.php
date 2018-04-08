@@ -42,13 +42,14 @@
               </div>
             {/accessories}
           {/categories}
-        </div>
+        </div> 
 
         <br />
 
         <!-- These are the slots for the items -->
         <form action="set/save" method="post" id="set-form">
           <div class="slots">
+          
             {categories}
               <div id="{categoryName}" class="dropzone {categoryName}" style="text-transform: capitalize">
                 <input id="{categoryName}-selected" name="{categoryName}" hidden/>
@@ -80,13 +81,14 @@
 
             <div class="row">
                 <input id="set-name" form="set-form" class="form-control" type="text" name="name" placeholder="Set Name" required>
+                <input id="set-id" form="set-form" name="id" hidden>
                 <input id="set-save" form="set-form" class="btn btn-success mx-auto" type="submit" value="Save">
             </div>
             <div class="row">
                 <input id="set-reset" class="btn btn-danger mx-auto" type="reset" name="reset" value="Reset">
             </div>
 
-            <div class="dropdown">
+            <div class="dropdown" id="set-builder-dropdown">
                 <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown">Presets
                 <span class="caret"></span></button>
                 <ul id="homepage-presets" class="dropdown-menu">

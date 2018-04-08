@@ -32,16 +32,44 @@ class Set extends Application
         
     }
 
-    public function save() {
+    public function save($id = null) {
+
+        if ($id == null) {
+     
+            $this->new_set();
+        }
+
+        $set = $this->sets->get($id);
+
+        $this->session->set_userdata('set', $set);
+        $task = $this->session->userdata('set');
+
+         // setup for validation
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules($this->sets->rules());
+
+        // retrieve & update data transfer buffer
         $set = (array) $this->session->userdata('set');
         $set = array_merge($set, $this->input->post());
+        $set = (object) $set;  // convert back to object
+        $this->session->set_userdata('set', (object) $set);
+
+        $this->sets->update($set);
         
+        redirect($_SERVER['HTTP_REFERER']);
+        
+        
+    }
+
+    private function new_set() {
+        /* New Set ----------------------------*/
+        $set = (array) $this->session->userdata('set');
+        $set = array_merge($set, $this->input->post());
+
         $set = (object) $set;
         $this->session->set_userdata('set', (object) $set);
 
-        if (!empty($set->name)) {
-            $set->id = $this->sets->highest() + 1;
-            
+        if (!empty($set->name)) {            
             if (!empty($set->weapon)) {
                 $set->weapon = $this->accessories->some('accessoryName', $set->weapon)[0]->accessoryId;
             }
@@ -58,7 +86,15 @@ class Set extends Application
                 $set->accessory = $this->accessories->some('accessoryName', $set->accessory)[0]->accessoryId;
             }
 
+            if (empty($set->id)) {
+                $set->id = $this->sets->highest() + 1;
+            }
+            
             $this->sets->add($set);
+            
         }
+
+        redirect($_SERVER['HTTP_REFERER']);
     }
+
 }

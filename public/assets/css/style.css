@@ -206,6 +206,10 @@ nav {
     width: 30%;
 }
 
+#set-builder-dropdown {
+    width: 100%;
+}
+
 .dropdown button {
     background: none;
     font-family: 'Violence';

@@ -5,6 +5,7 @@
 ## 2.0.1 (2018-04-07)
 Feature:
   - Create a set
+  - Edit a set
 
 ## 2.0.0 (2018-04-04)
 Feature:
