@@ -1,58 +1,61 @@
 /* Document On-Load's
 ------------------------------------------------------------------------------*/
 
-$(function() {
+$(function () {
 
     /**
      * Event listener for homepage presets.
      */
     $("#homepage-presets").on('click', 'li', loadPreset); // Set list
     $('#set-reset').click(resetAll); // Reset Button
- 
+
     /**
      * Loads the pre-set options onto the character.
      */
-    function loadPreset()
-    {
+    function loadPreset() {
         resetAll();
         // Get the set id.
         var setID = $(this).attr("data-setid");
 
         // Query the specific set.
-        data.getSets(setID, function(set) {
+        data.getSets(setID, function (set) {
 
-            setInputField(set.name);
-            
+            $('#set-name').val(set.name)
+
             // Load in the accessories.
-            data.getCatalog(null, function(catalog) {
+            data.getCatalog(null, function (catalog) {
 
                 // Go into div 'all-items', find corresponding item from 'catalog[set["chest"]]'
                 if (set['chest']) {
-                    let itemType = 'chest';                    
+                    let itemType = 'chest';
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
+                    setInputField(item);
                 }
 
                 if (set["head"]) {
-                    let itemType = 'head';                    
+                    let itemType = 'head';
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
+                    setInputField(item);                    
                 }
 
                 if (set["weapon"]) {
-                    let itemType = 'weapon';                    
+                    let itemType = 'weapon';
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
+                    setInputField(item);                    
                 }
 
                 if (set["accessory"]) {
-                    let itemType = 'accessory';                    
+                    let itemType = 'accessory';
                     let item = catalog[set[itemType]].accessoryName;
                     moveItemToSlot(item, itemType);
                     addItem(item, itemType);
+                    setInputField(item);                    
                 }
 
             });
@@ -62,11 +65,22 @@ $(function() {
 
     /**
      * Put the set name into the input field when changing sets.
-     * @param {String} set 
+     * @param {Item} item   object contains all the info on the item
      */
-    function setInputField(set) {
-        $('#set-name').val(set)
+    function setInputField(itemName) {
+
+        // WHEN WE LOAD A SET, WE NEED TO SET THE INPUT FIELD VALUES BEFORE SAVING
+
+        let i = $('#' + itemName + '-selected');
+
+        console.log("ID: " + itemName);
+        
+
+        i.val(itemName);
+
+        console.log(i.val());
     }
+
 
     /**
      * Moves an item in catalog to a specified slot. Used for editing sets.
@@ -115,7 +129,7 @@ $(function() {
 
 let tooltip = document.querySelectorAll('.coupontooltip');
 
-document.addEventListener('mousemove', function(e) {
+document.addEventListener('mousemove', function (e) {
     for (let i = tooltip.length; i--;) {
         tooltip[i].style.left = e.pageX + 'px';
         tooltip[i].style.top = e.pageY + 'px';
@@ -351,11 +365,11 @@ interact('.draggable')
         onmove: dragMoveListener,
 
         // call this function on every dragend event
-        onend: function(event) {
+        onend: function (event) {
             // TODO: implement action for when drag and drop has ended.
         }
     })
-    .on('dragmove', function(event) {
+    .on('dragmove', function (event) {
         x += event.dx;
         y += event.dy;
 
@@ -400,7 +414,7 @@ interact('.dropzone').dropzone({
     /*
     Listener for drop related events.
      */
-    ondropactivate: function(event) {
+    ondropactivate: function (event) {
 
         // add active dropzone feedback
         event.target.classList.add('drop-active');
@@ -411,14 +425,11 @@ interact('.dropzone').dropzone({
     Listener for when an item is dragged to the center of the slot.
     Changes color once successful (green/red).
      */
-    ondragenter: function(event) {
+    ondragenter: function (event) {
 
         // Assign our currently interacting objects
         draggableElement = event.relatedTarget;
         dropzoneElement = event.target;
-
-        console.log("Draggable: ")
-        console.log(draggableElement);
 
         // The item and type that we're dragging (i.e. head, chest, etc.)
         item = draggableElement.parentElement.id;
@@ -447,7 +458,7 @@ interact('.dropzone').dropzone({
     Listener for when an item, which is currently centered on a slot, leaves
     the center of the slot (color goes back to purple).
      */
-    ondragleave: function(event) {
+    ondragleave: function (event) {
 
         draggableElement = event.relatedTarget;
         dropzoneElement = event.target;
@@ -475,7 +486,7 @@ interact('.dropzone').dropzone({
     it's a valid slot for the item, and if not, we return the item to it's
     origin.
      */
-    ondrop: function(event) {
+    ondrop: function (event) {
 
         dropzoneElement = event.target;
         draggableElement = event.relatedTarget;
@@ -495,11 +506,11 @@ interact('.dropzone').dropzone({
 
             // Invalid item, remove color and return to origin position
             itemReset(draggableElement);
-            
+
 
         }
     },
-    ondropdeactivate: function(event) {
+    ondropdeactivate: function (event) {
 
         // remove active dropzone feedback
         event.target.classList.remove('drop-active');
@@ -512,7 +523,7 @@ interact('.dropzone').dropzone({
 /* Ash Effects
 ------------------------------------------------------------------------------*/
 
-(function() {
+(function () {
     var COLORS, Confetti, NUM_CONFETTI, PI_2, canvas, confetti, context, drawCircle, i, range, resizeWindow, xpos;
 
     NUM_CONFETTI = 50;
@@ -535,22 +546,22 @@ interact('.dropzone').dropzone({
 
     window.h = 0;
 
-    resizeWindow = function() {
+    resizeWindow = function () {
         window.w = canvas.width = window.innerWidth;
         return window.h = canvas.height = window.innerHeight;
     };
 
     window.addEventListener('resize', resizeWindow, false);
 
-    window.onload = function() {
+    window.onload = function () {
         return setTimeout(resizeWindow, 0);
     };
 
-    range = function(a, b) {
+    range = function (a, b) {
         return (b - a) * Math.random() + a;
     };
 
-    drawCircle = function(x, y, r, style) {
+    drawCircle = function (x, y, r, style) {
         context.beginPath();
         context.arc(x, y, r, 0, PI_2, false);
         context.fillStyle = style;
@@ -559,12 +570,12 @@ interact('.dropzone').dropzone({
 
     xpos = 0.5;
 
-    document.onmousemove = function(e) {
+    document.onmousemove = function (e) {
         return xpos = e.pageX / w;
     };
 
-    window.requestAnimationFrame = (function() {
-        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
+    window.requestAnimationFrame = (function () {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
             return window.setTimeout(callback, 1000 / 60);
         };
     })();
@@ -609,7 +620,7 @@ interact('.dropzone').dropzone({
 
     };
 
-    confetti = (function() {
+    confetti = (function () {
         var j, ref, results;
         results = [];
         for (i = j = 1, ref = NUM_CONFETTI; 1 <= ref ? j <= ref : j >= ref; i = 1 <= ref ? ++j : --j) {
@@ -618,7 +629,7 @@ interact('.dropzone').dropzone({
         return results;
     })();
 
-    window.step = function() {
+    window.step = function () {
         var c, j, len, results;
         requestAnimationFrame(step);
         context.clearRect(0, 0, w, h);
