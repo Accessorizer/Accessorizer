@@ -91,7 +91,7 @@
             <div class="dropdown" id="set-builder-dropdown">
                 <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown">Presets
                 <span class="caret"></span></button>
-                <ul id="homepage-presets" class="dropdown-menu">
+                <ul id="set-presets" class="dropdown-menu">
                   {sets}
                     <li class="dropdown-item" data-setid="{id}" style="text-transform: capitalize"><a>{name}</a></li>
                   {/sets}
