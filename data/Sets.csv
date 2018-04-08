@@ -2,4 +2,4 @@ id,name,weapon,head,chest,accessory
 1,Tank,,,,7
 2,Ninja,0,3,,6
 3,"Naked Ninja",0,5,11,8
-4,Tank,,,,
+4,Tank,0,3,11,6

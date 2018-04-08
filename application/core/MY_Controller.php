@@ -25,7 +25,7 @@ class Application extends CI_Controller
 		$this->data = array ();
 		$this->data['pagetitle'] = 'PUBG Kit Selector';
 		$this->data['ci_version'] = (ENVIRONMENT === 'development') ? 'CodeIgniter Version <strong>'.CI_VERSION.'</strong>' : '';
-		$this->data['userrole'] = $this->session->userdata('userrole') != null ? $this->session->userdata('userrole') : 'Guest';
+		//$this->data['userrole'] = $this->session->userdata('userrole') != null ? $this->session->userdata('userrole') : 'Guest';
 	}
 
 	/**
@@ -33,7 +33,13 @@ class Application extends CI_Controller
 	 */
 	function render($template = 'template')
 	{
-		$this->data['menubar'] = $this->parser->parse('_menubar', $this->config->item('menu_choices'), true);
+		if (empty($this->session->userdata('role'))) {
+			$this->session->set_userdata('role', ROLE_GUEST);
+		}
+		$menuItem = $this->config->item('menu_choices');
+		$menuItem['role'] = $this->session->userdata('role');
+
+		$this->data['menubar'] = $this->parser->parse('_menubar', $menuItem, true);
 		$this->data['content'] = $this->parser->parse($this->data['pagebody'], $this->data, true);
 		$this->data['footer'] = $this->parser->parse('_footer', $this->config->item('footer'), true);
 		$this->parser->parse('template', $this->data);
