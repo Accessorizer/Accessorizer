@@ -17,7 +17,7 @@ class SetsTest  extends TestCase {
     }
 
     public function testSetName() {
-        $this->sets->setCategoryName("Hello");
+        $this->sets->setName("Hello");
         $this->assertEquals("Hello", $this->sets->name);
     }
 

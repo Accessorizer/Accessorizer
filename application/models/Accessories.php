@@ -28,4 +28,29 @@ class Accessories extends CSV_Model
     {
         parent::__construct(APPPATH . "../data/Accessories.csv", "accessoryId", "accessories");
     }
+
+    function setId($id)
+    {
+        $this->accessoryId = $id;
+    }
+
+    function setName($name)
+    {
+        $this->accessoryName = $name;
+    }
+
+    function setAccessoryImage($image)
+    {
+        $this->accessoryImage = $image;
+    }
+
+    function setAcessoryWeight($weight)
+    {
+        $this->accessoryWeight = $weight;
+    }
+
+    function setAccessoryDamage($damage)
+    {
+        $this->accessoryDamage = $damage;
+    }
 }
