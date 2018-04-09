@@ -13,30 +13,21 @@ class CategoriesTest  extends TestCase {
     {
         $this->categories->setCategoryId(10);
         $this->assertEquals(10, $this->categories->categoryId);
-        $this->expectException(Exception::class);
-        $this->categories->setcategoriesName("!@#$%^&*()");
+
     }
 
     public function testCategoryName() {
-        $this->categories->setSize(1);
-        $this->assertEquals(1, $this->categories->getSize());
-        $this->expectException(Exception::class);
-        $this->categories->setSize("Am I here?");
+        $this->categories->setCategoryName("Hello");
+        $this->assertEquals("Hello", $this->categories->categoryName);
     }
 
     public function testCategoryDescription() {
-        $this->categories->setGroup(2);
-        $this->assertEquals(2, $this->categories->getGroup());
-        $this->expectException(Exception::class);
-        $this->categories->setGroup(8675309);
+        $this->categories->setCategoryDescription("Testing 123 123");
+        $this->assertEquals("Testing 123 123", $this->categories->description);
     }
 
     public function testCategoryAccessories(){
-        $this->categories->setPriority(3);
-        $this->assertEquals(3, $this->categories->getPriority());
-        $this->expectException(Exception::class);
-        $this->categories->setPriority(-42);
-
+        $this->categories->setCategoryAccessories([1, 2, 3, 4]);
+        $this->assertEquals([1, 2, 3, 4], $this->categories->accessories);
     }
-
 }
