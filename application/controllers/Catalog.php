@@ -21,7 +21,7 @@ class Catalog extends Application
 
         $this->data['categories'] = $categories;
         $this->data['pagebody'] = 'catalog';
-		$this->data['pagetitle'] = 'Accessorize Soldier!';
+		$this->data['pagetitle'] = 'Checkout The Catalog!';
 		$this->render();
 	}
 
