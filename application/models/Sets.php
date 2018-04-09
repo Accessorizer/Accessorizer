@@ -22,4 +22,34 @@ class Sets extends CSV_Model
     {
         parent::__construct(APPPATH . "../data/Sets.csv", "id", "sets");
     }
+
+    function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    function setWeapon($weapon)
+    {
+        $this->weapon = $weapon;
+    }
+
+    function setHead($head)
+    {
+        $this->head = $head;
+    }
+
+    function setChest($chest)
+    {
+        $this->chest = $chest;
+    }
+
+    function setAccessory($accessory)
+    {
+        $this->accessory = $accessory;
+    }
 }
